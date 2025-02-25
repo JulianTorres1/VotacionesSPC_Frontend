@@ -5,6 +5,7 @@ import LogoSalesianos from './media/img/logoSPC.png';
 import LogoPacto from './media/img/logoPacto.png';
 import axios from 'axios';
 import Status from './Status.tsx';
+import sena from './media/img/logoSena.png';
 
 type Course = {
   id: string;
@@ -20,8 +21,6 @@ interface Candidate {
 }
 
 const courses: Course[] = [
-  { id: '1', name: '1°' },
-  { id: '2', name: '2°' },
   { id: '3', name: '3°' },
   { id: '4', name: '4°' },
   { id: '5', name: '5°' },
@@ -33,13 +32,19 @@ const courses: Course[] = [
   { id: '11', name: '11°' },
 ];
 
+
+const API_URL = import.meta.env.VITE_API_URL;
+console.log('API URL:', API_URL);
+
+// Add a new state variable to track voting stages
 function App() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [votingForPersoneros, setVotingForPersoneros] = useState<boolean>(false);
+  const [votingStage, setVotingStage] = useState<'course' | 'personero' | 'consejo'>('course');
+  const [votingComplete, setVotingComplete] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:5005/votaciones/getCandidatos')
+    axios.get(`${API_URL}/getCandidatos`)
       .then(response => {
         setCandidates(response.data);
         if (response.data.length > 0) {
@@ -51,16 +56,17 @@ function App() {
       });
   }, []);
 
+  // Modify the handleVote function
   const handleVote = (candidateId: string) => {
     console.log('Voting for candidate:', candidateId);
-    axios.post('http://localhost:5005/votaciones/create', { id_candidato: candidateId })
+    axios.post(`${API_URL}/create`, { id_candidato: candidateId })
       .then(() => {
-        alert(`Votaste por el candidato con ID: ${candidateId}`);
-        if (!votingForPersoneros) {
-          setVotingForPersoneros(true);
+        if (votingStage === 'course') {
+          setVotingStage('personero');
+        } else if (votingStage === 'personero') {
+          setVotingStage('consejo');
         } else {
-          setSelectedCourse(null);
-          setVotingForPersoneros(false);
+          setVotingComplete(true);
         }
       })
       .catch(error => {
@@ -69,6 +75,7 @@ function App() {
       });
   };
 
+  // Modify the main content rendering
   return (
     <Router>
       <Routes>
@@ -92,77 +99,111 @@ function App() {
             </header>
 
             <main className="flex-grow max-w-7xl mx-auto px-4 py-8">
-              {!selectedCourse ? (
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold text-white">
-                    Selecciona tu curso
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {courses.map((course) => (
-                      <button
-                        key={course.id}
-                        onClick={() => setSelectedCourse(course.id)}
-                        className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border-2 border-secondary-yellow hover:border-secondary-orange"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Book className="w-6 h-6 text-primary" />
-                          <span className="text-lg font-medium text-primary-dark">
-                            {course.name}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
+              {votingComplete ? (
+                <div className="flex flex-col items-center justify-center space-y-6 text-center">
+                  <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-secondary-yellow max-w-md">
+                    <h2 className="text-2xl font-bold text-primary-dark mb-4">
+                      ¡Votación Completada!
+                    </h2>
+                    <p className="text-primary-dark/80 mb-6">
+                      Has completado exitosamente tu proceso de votación. Gracias por participar en la democracia estudiantil.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setVotingComplete(false);
+                        setSelectedCourse(null);
+                        setVotingStage('course');
+                      }}
+                      className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary-dark transition-colors duration-200"
+                    >
+                      Aceptar
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-white">
-                      {votingForPersoneros ? 'Selecciona tu personero' : 'Selecciona tu candidato'}
-                    </h2>
-                    <button
-                      onClick={() => {
-                        setSelectedCourse(null);
-                        setVotingForPersoneros(false);
-                      }}
-                      className="text-secondary-yellow hover:text-secondary-orange font-semibold"
-                    >
-                      Volver a cursos
-                    </button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {candidates
-                      .filter((candidate) => votingForPersoneros ? candidate.grupo === 'Personero' : candidate.grupo === selectedCourse)
-                      .map((candidate) => (
-                        <div
-                          key={candidate.id_candidato}
-                          className="bg-white rounded-lg shadow-md overflow-hidden border-2 border-secondary-yellow"
+                <>
+                  {votingStage === 'course' && !selectedCourse ? (
+                    <div className="space-y-6">
+                      <h2 className="text-3xl font-bold text-white">
+                        Selecciona tu curso
+                      </h2>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {courses.map((course) => (
+                          <button
+                            key={course.id}
+                            onClick={() => setSelectedCourse(course.id)}
+                            className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border-2 border-secondary-yellow hover:border-secondary-orange"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Book className="w-6 h-6 text-primary" />
+                              <span className="text-lg font-medium text-primary-dark">
+                                {course.name}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-3xl font-bold text-white ">
+                          {votingStage === 'personero' 
+                            ? 'Selecciona tu personero' 
+                            : votingStage === 'consejo' 
+                              ? 'Selecciona tu representante al Consejo'
+                              : 'Selecciona tu Representante de Curso'
+                          }
+                        </h2>
+                        <button
+                          onClick={() => {
+                            setSelectedCourse(null);
+                            setVotingStage('course');
+                          }}
+                          className="text-secondary-yellow hover:text-secondary-orange font-semibold"
                         >
-                          <div className="w-full h-60 flex justify-center items-center bg-gray-200">
-                            <img
-                              src={candidate.foto_url}
-                              alt={candidate.nombre}
-                              className="w-full h-full object-contain"
-                              style={{ aspectRatio: "4/3" }}
-                            />
-                          </div>
-                          <div className="p-4">
-                            <h3 className="text-lg font-semibold text-primary-dark">
-                              {candidate.nombre}
-                            </h3>
-                            <p className="text-primary-dark/80 mt-2">{candidate.biografia}</p>
-                            <button
-                              className="mt-4 w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2"
-                              onClick={() => handleVote(candidate.id_candidato)}
+                          Volver a cursos
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {candidates
+                          .filter((candidate) => {
+                            if (votingStage === 'personero') return candidate.grupo === 'Personero';
+                            if (votingStage === 'consejo') return candidate.grupo === 'Consejo';
+                            return candidate.grupo === selectedCourse;
+                          })
+                          .map((candidate) => (
+                            <div
+                              key={candidate.id_candidato}
+                              className="bg-white rounded-lg shadow-md overflow-hidden border-2 border-secondary-yellow"
                             >
-                              <Vote className="w-5 h-5" />
-                              Votar
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                              <div className="w-full h-60 flex justify-center items-center bg-gray-200">
+                                <img
+                                  src={candidate.foto_url}
+                                  alt={candidate.nombre}
+                                  className="w-full h-full object-contain"
+                                  style={{ aspectRatio: "4/3" }}
+                                />
+                              </div>
+                              <div className="p-4">
+                                <h3 className="text-lg font-semibold text-primary-dark">
+                                  {candidate.nombre}
+                                </h3>
+                                <p className="text-primary-dark/80 mt-2">{candidate.biografia}</p>
+                                <button
+                                  className="mt-4 w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2"
+                                  onClick={() => handleVote(candidate.id_candidato)}
+                                >
+                                  <Vote className="w-5 h-5" />
+                                  Votar
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </main>
 
@@ -187,7 +228,7 @@ function App() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4" />
-                        <span>info@salesianoscartagena.edu.co</span>
+                        <span>sistemas.spc@salesianos.edu.co</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
@@ -210,6 +251,7 @@ function App() {
                     </div>
                     <div className="text-lg font-semibold text-primary">
                       Nicolas Torres
+                      <img src={sena} alt="Logo Sena" className="inline-block w-6 h-6 ml-2" />
                     </div>
                     <div className="text-sm text-primary-dark/60">
                       © {new Date().getFullYear()} Todos los derechos reservados
