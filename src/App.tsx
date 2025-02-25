@@ -115,6 +115,7 @@ function App() {
                         setVotingStage('course');
                       }}
                       className="bg-primary text-white py-2 px-6 rounded-md hover:bg-primary-dark transition-colors duration-200"
+                      id='aceptar'
                     >
                       Aceptar
                     </button>
@@ -161,6 +162,7 @@ function App() {
                             setVotingStage('course');
                           }}
                           className="text-secondary-yellow hover:text-secondary-orange font-semibold"
+                          id='volver'
                         >
                           Volver a cursos
                         </button>
@@ -194,7 +196,7 @@ function App() {
                                   className="mt-4 w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2"
                                   onClick={() => handleVote(candidate.id_candidato)}
                                 >
-                                  <Vote className="w-5 h-5" />
+                                  <Vote id='votar' className="w-5 h-5" />
                                   Votar
                                 </button>
                               </div>
