@@ -10,7 +10,7 @@ function Status() {
       .then(data => {
         const voteCount: { [key: string]: number } = {};
         
-        data.forEach(vote => {
+        data.forEach((vote: { id_candidato: string }) => {
           voteCount[vote.id_candidato] = (voteCount[vote.id_candidato] || 0) + 1;
         });
 
