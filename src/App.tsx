@@ -47,9 +47,6 @@ function App() {
     axios.get(`${API_URL}/getCandidatos`)
       .then(response => {
         setCandidates(response.data);
-        if (response.data.length > 0) {
-          setSelectedCourse(response.data[0].grupo);
-        }
       })
       .catch(error => {
         console.error('Error fetching candidates:', error);
