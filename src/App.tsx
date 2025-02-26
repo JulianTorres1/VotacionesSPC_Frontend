@@ -6,6 +6,7 @@ import LogoPacto from './media/img/logoPacto.png';
 import axios from 'axios';
 import Status from './Status.tsx';
 import sena from './media/img/logoSena.png';
+import bgImage from './media/img/bg.jpg';
 
 type Course = {
   id: string;
@@ -53,6 +54,23 @@ function App() {
       });
   }, []);
 
+  // Add this helper function at the top of your App component
+  const getCardBackgroundColor = (nombre: string) => {
+    const numero = nombre.substring(0, 2);
+    switch (numero) {
+      case '01':
+        return 'bg-yellow-300';
+      case '02':
+        return 'bg-blue-300';
+      case '03':
+        return 'bg-red-300';
+      case '04':
+        return 'bg-green-300';
+      default:
+        return 'bg-white';
+    }
+  };
+
   // Modify the handleVote function
   const handleVote = (candidateId: string) => {
     console.log('Voting for candidate:', candidateId);
@@ -78,7 +96,7 @@ function App() {
       <Routes>
         <Route path="/status" element={<Status />} />
         <Route path="/" element={
-          <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary-darker via-primary-dark to-primary">
+          <div className="min-h-screen flex flex-col bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
             <header className="bg-white shadow-lg">
               <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-20">
@@ -158,7 +176,7 @@ function App() {
                             setSelectedCourse(null);
                             setVotingStage('course');
                           }}
-                          className="text-secondary-yellow hover:text-secondary-orange font-semibold"
+                          className="bg-white text-primary-dark hover:text-secondary-orange font-semibold px-4 py-2 rounded-md border-2 border-primary transition-colors duration-200"
                           id='volver'
                         >
                           Volver a cursos
@@ -174,7 +192,7 @@ function App() {
                           .map((candidate) => (
                             <div
                               key={candidate.id_candidato}
-                              className="bg-white rounded-lg shadow-md overflow-hidden border-2 border-secondary-yellow"
+                              className={`${getCardBackgroundColor(candidate.nombre)} rounded-lg shadow-md overflow-hidden border-2 border-secondary-yellow`}
                             >
                               <div className="w-full h-60 flex justify-center items-center bg-gray-200">
                                 <img
