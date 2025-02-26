@@ -194,7 +194,7 @@ function App() {
                               key={candidate.id_candidato}
                               className={`${getCardBackgroundColor(candidate.nombre)} rounded-lg shadow-md overflow-hidden border-2 border-secondary-yellow`}
                             >
-                              <div className="w-full h-60 flex justify-center items-center bg-gray-200">
+                              <div className="w-full h-48 flex justify-center items-center bg-gray-200">
                                 <img
                                   src={candidate.foto_url}
                                   alt={candidate.nombre}
@@ -202,16 +202,16 @@ function App() {
                                   style={{ aspectRatio: "4/3" }}
                                 />
                               </div>
-                              <div className="p-4">
-                                <h3 className="text-lg font-semibold text-primary-dark">
+                              <div className="p-3">
+                                <h3 className="text-base font-semibold text-primary-dark">
                                   {candidate.nombre}
                                 </h3>
-                                <p className="text-primary-dark/80 mt-2">{candidate.biografia}</p>
+                                <p className="text-sm text-primary-dark/80 mt-1">{candidate.biografia}</p>
                                 <button
-                                  className="mt-4 w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2"
+                                  className="mt-3 w-full bg-primary text-white py-2 px-3 rounded-md hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2"
                                   onClick={() => handleVote(candidate.id_candidato)}
                                 >
-                                  <Vote id='votar' className="w-5 h-5" />
+                                  <Vote id='votar' className="w-4 h-4" />
                                   Votar
                                 </button>
                               </div>
