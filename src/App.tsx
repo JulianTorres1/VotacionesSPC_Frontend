@@ -59,15 +59,15 @@ function App() {
     const numero = nombre.substring(0, 2);
     switch (numero) {
       case '01':
-        return 'bg-yellow-300';
+      return 'bg-yellow-400';
       case '02':
-        return 'bg-blue-300';
+      return 'bg-blue-500';
       case '03':
-        return 'bg-red-300';
+      return 'bg-red-600';
       case '04':
-        return 'bg-green-300';
+      return 'bg-green-600';
       default:
-        return 'bg-white';
+      return 'bg-white';
     }
   };
 
